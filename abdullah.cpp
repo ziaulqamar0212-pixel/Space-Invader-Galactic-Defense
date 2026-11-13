@@ -105,3 +105,45 @@ void drawBullets(sf::RenderWindow& window, vector<Bullet>& bullets)
         window.draw(bullets[i].shape);
     }
 }
+void checkCollisions(vector<Bullet>& bullets, vector<Enemy>& enemies, sf::RectangleShape& player, int& score, int& lives)
+{
+    for (int i = (int)bullets.size() - 1; i >= 0; i--)
+    {
+        bool bulletRemoved = false;
+        if (bullets[i].fromplayer)
+        {
+            for (int j = 0; j < enemies.size(); j++)
+            {
+                if (enemies[j].alive && bullets[i].shape.getGlobalBounds().findIntersection
+                ( enemies[j].shape.getGlobalBounds()))
+                {
+                    enemies[j].alive = false;
+                    score += 10;
+                    bullets.erase(bullets.begin() + i);
+                    bulletRemoved = true;
+                    break;
+                }
+            }
+        }
+        if (!bulletRemoved && i < bullets.size())
+        {
+            if (!bullets[i].fromplayer &&
+                bullets[i].shape.getGlobalBounds().findIntersection(
+                    player.getGlobalBounds()))
+            {
+                lives--;
+                bullets.erase(bullets.begin() + i);
+            }
+        }
+    }
+}
+int countEnemies(vector<Enemy>& enemies)
+{
+    int count = 0;
+    for (int i = 0; i < enemies.size(); i++)
+    {
+        if (enemies[i].alive)
+            count++;
+    }
+    return count;
+}
