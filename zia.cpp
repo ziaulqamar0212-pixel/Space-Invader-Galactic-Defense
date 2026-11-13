@@ -81,11 +81,75 @@ sf::RectangleShape player({50.f,30.f});
                 addEnemyBullet(bullets, enemies);
                 enemyShootClock.restart();
             }
+        
+
+            moveEnemies(enemies, enemyDirection);
+            moveBullets(bullets);
+
+            checkCollisions(
+                bullets,
+                enemies,
+                player,
+                score,
+                lives
+            );
+
+            if (countEnemies(enemies) == 0)
+            {
+                createEnemies(enemies);
+            }
+
+            if (lives <= 0)
+            {
+                gameOver = true;
+            }
+
+            for (int i = (int)bullets.size() - 1; i >= 0; i--)
+            {
+                float y = bullets[i].shape.getPosition().y;
+
+                if (y < 0 || y > HEIGHT)
+                {
+                    bullets.erase(bullets.begin() + i);
+                }
+            }
         }
-    
+        else
+        {
+            if (sf::Keyboard::isKeyPressed(
+                sf::Keyboard::Key::R))
+            {
+                score = 0;
+                lives = 3;
+                gameOver = false;
+
+                bullets.clear();
+                createEnemies(enemies);
+
+                player.setPosition({375.f, 540.f});
+                enemyDirection = 2.f;
+            }
+        }
+
+        scoreText.setString("Score: " + to_string(score));
+        livesText.setString("Lives: " + to_string(lives));
+
+        window.clear(sf::Color::Black);
+
+        drawPlayer(window, player);
+        drawEnemies(window, enemies);
+        drawBullets(window, bullets);
+
+        window.draw(scoreText);
+        window.draw(livesText);
+
+        if (gameOver)
+        {
+            window.draw(gameOverText);
+        }
+
+        window.display();
     }
 
-
-    
-
-
+    return 0;
+}
