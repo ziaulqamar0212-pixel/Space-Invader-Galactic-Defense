@@ -1,59 +1,36 @@
-# Space Invaders
+# Space Invaders Game
 
-A 2D Space Invaders game written in C++ with SFML 3. The complete playable game
-is in `main.cpp`; the original individual contributions are kept in
-`abdullah.cpp` and `zia.cpp`.
+## Project Description
+Space Invaders is a 2D shooting game developed using C++ and SFML. The player controls a spaceship and shoots enemies to earn points while avoiding enemy attacks.
 
-## Gameplay
+## Team Members
+- **Abdullah** – Enemy system, bullets, collision detection, and game mechanics.
+- **Zia** – Player movement, game window, main game loop, and user interface.
 
-- Move the cyan player ship left and right.
-- Shoot the green enemies; each enemy hit adds 10 points.
-- Avoid red enemy bullets. The game ends when you lose all 3 lives.
-- A new enemy formation appears when all enemies in a formation are defeated.
-- Press `R` after Game Over to restart.
-
-The game window is 800 x 600 pixels.
-
-## Controls
-
-| Key | Action |
-| --- | --- |
-| Left Arrow | Move left |
-| Right Arrow | Move right |
-| Space | Shoot |
-| R | Restart after Game Over |
-
-## Requirements
-
-- A C++17-compatible compiler (the project has been built with MinGW g++).
-- SFML 3 with its headers, libraries, and runtime DLLs installed.
-- On Windows, the game loads Arial from `C:\Windows\Fonts\arial.ttf`.
-
-Make sure the SFML `bin` directory is on `PATH` when launching the game so
-Windows can find the SFML runtime DLLs.
-
-## Build and Run (Windows PowerShell)
-
-Run these commands from the project directory. The output folder is already
-included in the project.
-
-```powershell
-g++ -std=c++17 main.cpp -o output\space_invader.exe -lsfml-graphics -lsfml-window -lsfml-system
-.\output\space_invader.exe
-```
-
-The compiler must be configured to find the SFML include and library
-directories. If SFML is installed with MSYS2 UCRT64, add
-`C:\msys64\ucrt64\bin` to `PATH` before running the executable.
+## Technologies Used
+- C++
+- SFML 3
+- Visual Studio Code
+- GitHub
 
 ## Project Files
+- `abdullah.cpp` – Abdullah's original contribution.
+- `zia.cpp` – Zia's original contribution.
+- `main.cpp` – Final combined game code.
+- `README.md` – Project information and documentation.
 
-- `main.cpp` - Combined game source (player, enemies, bullets, collisions, and interface).
-- `abdullah.cpp` - Original enemy and game-mechanics contribution.
-- `zia.cpp` - Original player, window, and game-loop contribution.
-- `output\space_invader.exe` - Built Windows game executable.
+## Build and Run
+Build from the project directory with SFML 3 installed:
 
-## Team
+```powershell
+g++ -std=c++17 main.cpp -o output\space_invader_combined.exe -lsfml-graphics -lsfml-window -lsfml-system
+.\output\space_invader_combined.exe
+```
 
-- **Abdullah** - Enemy system, bullets, collision detection, and game mechanics.
-- **Zia** - Player movement, game window, main game loop, and user interface.
+Use the left and right arrow keys to move, Space to shoot, and R to restart after Game Over.
+
+## Team Collaboration
+The original contributions are kept in their separate files; the playable game combines both contributions in `main.cpp`.
+
+## Project Goal
+To develop a simple and enjoyable 2D Space Invaders game while learning C++, SFML, and teamwork through GitHub.

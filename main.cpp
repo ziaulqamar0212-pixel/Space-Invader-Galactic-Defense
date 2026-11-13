@@ -42,7 +42,7 @@ void createEnemies(vector<Enemy>& enemies)
 
 void drawEnemies(sf::RenderWindow& window, vector<Enemy>& enemies)
 {
-    for (std::size_t i = 0; i < enemies.size(); i++)
+    for (size_t i = 0; i < enemies.size(); i++)
     {
         if (enemies[i].alive)
         {
@@ -54,7 +54,7 @@ void drawEnemies(sf::RenderWindow& window, vector<Enemy>& enemies)
 void moveEnemies(vector<Enemy>& enemies, float& direction)
 {
     bool changeDirection = false;
-    for (std::size_t i = 0; i < enemies.size(); i++)
+    for (size_t i = 0; i < enemies.size(); i++)
     {
         if (enemies[i].alive)
         {
@@ -69,7 +69,7 @@ void moveEnemies(vector<Enemy>& enemies, float& direction)
     {
         direction = -direction;
     }
-    for (std::size_t i = 0; i < enemies.size(); i++)
+    for (size_t i = 0; i < enemies.size(); i++)
     {
         if (enemies[i].alive)
         {
@@ -90,7 +90,7 @@ void addPlayerBullet(vector<Bullet>& bullets, sf::RectangleShape& player)
 
 void addEnemyBullet(vector<Bullet>& bullets, vector<Enemy>& enemies)
 {
-    for (std::size_t i = 0; i < enemies.size(); i++)
+    for (size_t i = 0; i < enemies.size(); i++)
     {
         if (enemies[i].alive)
         {
@@ -110,7 +110,7 @@ void addEnemyBullet(vector<Bullet>& bullets, vector<Enemy>& enemies)
 
 void moveBullets(vector<Bullet>& bullets)
 {
-    for (std::size_t i = 0; i < bullets.size(); i++)
+    for (size_t i = 0; i < bullets.size(); i++)
     {
         if (bullets[i].fromPlayer)
         {
@@ -125,7 +125,7 @@ void moveBullets(vector<Bullet>& bullets)
 
 void drawBullets(sf::RenderWindow& window, vector<Bullet>& bullets)
 {
-    for (std::size_t i = 0; i < bullets.size(); i++)
+    for (size_t i = 0; i < bullets.size(); i++)
     {
         window.draw(bullets[i].shape);
     }
@@ -143,7 +143,7 @@ void checkCollisions(
         bool bulletRemoved = false;
         if (bullets[i].fromPlayer)
         {
-            for (std::size_t j = 0; j < enemies.size(); j++)
+            for (size_t j = 0; j < enemies.size(); j++)
             {
                 if (enemies[j].alive &&
                     bullets[i].shape.getGlobalBounds().findIntersection(
@@ -157,7 +157,7 @@ void checkCollisions(
                 }
             }
         }
-        if (!bulletRemoved && static_cast<std::size_t>(i) < bullets.size() &&
+        if (!bulletRemoved && static_cast<size_t>(i) < bullets.size() &&
             !bullets[i].fromPlayer &&
             bullets[i].shape.getGlobalBounds().findIntersection(player.getGlobalBounds()))
         {
@@ -170,7 +170,7 @@ void checkCollisions(
 int countEnemies(vector<Enemy>& enemies)
 {
     int count = 0;
-    for (std::size_t i = 0; i < enemies.size(); i++)
+    for (size_t i = 0; i < enemies.size(); i++)
     {
         if (enemies[i].alive)
         {
