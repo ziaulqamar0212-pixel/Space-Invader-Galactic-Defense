@@ -71,3 +71,37 @@ void addPlayerBullet(vector<Bullet>& bullets,sf::RectangleShape & player)
     bullet.fromplayer = true;
     bullets.push_back(bullet);
 }
+void addEnemyBullet(vector<Bullet>& bullets, vector<Enemy>& enemies)
+{
+    for (int i = 0; i < enemies.size(); i++)
+    {
+        if (enemies[i].alive)
+        {
+            Bullet bullet;
+            bullet.shape.setSize({5.f, 15.f});
+            bullet.shape.setFillColor(sf::Color::Red);
+            bullet.shape.setPosition({ enemies[i].shape.getPosition().x + 18.f,
+                enemies[i].shape.getPosition().y + 30.f});
+            bullet.fromplayer = false;
+            bullets.push_back(bullet);
+            break;
+        }
+    }
+}
+void moveBullets(vector<Bullet>& bullets)
+{
+    for (int i = 0; i < bullets.size(); i++)
+    {
+        if (bullets[i].fromplayer)
+        bullets[i].shape.move({0.f, -7.f});
+        else
+            bullets[i].shape.move({0.f, 5.f});
+    }
+}
+void drawBullets(sf::RenderWindow& window, vector<Bullet>& bullets)
+{
+    for (int i = 0; i < bullets.size(); i++)
+    {
+        window.draw(bullets[i].shape);
+    }
+}
