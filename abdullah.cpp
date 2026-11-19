@@ -2,6 +2,7 @@
 #include<iostream>
 #include<vector>
 #include<optional>
+#include<fstream>
 using namespace std;
 
 const int width=800;
@@ -146,4 +147,67 @@ int countEnemies(vector<Enemy>& enemies)
             count++;
     }
     return count;
+}
+struct Enemy
+{
+    sf::RectangleShape shape;
+    bool alive;
+};
+struct scoreentry
+{
+    string name;
+    int score;
+};
+void sortleaderboard(vector<scoreentry>& scores)
+{
+    for (int i = 0; i < (int)scores.size() - 1; i++)
+    {
+        for (int j = 0; j < (int)scores.size() - i - 1; j++)
+        {
+            if (scores[j].score < scores[j + 1].score)
+            {
+                scoreentry temp = scores[j];
+                scores[j] = scores[j + 1];
+                scores[j + 1] = temp;
+            }
+        }
+    }
+}
+void loadleaderboard(vector<scoreentry>& scores)
+{
+    scores.clear();
+    ifstream file("leaderboard.txt");
+    string line;
+    while (getline(file, line))
+    {
+        stringstream row(line);
+        scoreentry entry;
+
+        if (row >> entry.score)
+        {
+            getline(row, entry.name);
+
+            if (!entry.name.empty() && entry.name[0] == ' ')
+                entry.name.erase(0, 1);
+
+            if (!entry.name.empty())
+                scores.push_back(entry);
+        }
+    }
+    file.close();
+    sortleaderboard(scores);
+}
+void savecore(const string& name, int score)
+{
+    ofstream file("leaderboard.txt", ios::app);
+
+    if (file.is_open())
+    {
+        file << score << " " << name << endl;
+        file.close();
+    }
+    else
+    {
+        cout << "Could not save leaderboard file!" << endl;
+    }
 }
