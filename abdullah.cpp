@@ -208,6 +208,21 @@ void savecore(const string& name, int score)
     }
     else
     {
-        cout << "Could not save leaderboard file!" << endl;
+        cout << "Could not savegit restore --staged .gitignore Space-Invader-Galactic-Defense leaderboard file!" << endl;
     }
+}
+bool enemyReachedPlayer(vector<Enemy>& enemies, sf::RectangleShape& player)
+{
+    for(int i=0;i<enemies.size();i++)
+    {
+        if(enemies[i].alive)
+        {
+            if(enemies[i].shape.getGlobalBounds().findIntersection(
+                player.getGlobalBounds()))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
