@@ -1,5 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include<iostream>
+#include<vector>
+#include <string>
 const int WIDTH = 800;
 const int HEIGHT = 600;
 void drawPlayer(sf::RenderWindow& window,sf::RectangleShape&player)
@@ -19,10 +21,16 @@ void movePlayer(sf::RectangleShape& player)
             player.move({5.f,0.f});
     }
 }
+void drawButton(sf::RenderWindow& window,sf::RectangleShape& button,sf::Text& text)
+{
+    window.draw(button);
+    window.draw(text);
+}
 int main()
 {
     sf::RenderWindow window(sf::VideoMode({WIDTH,HEIGHT}),"Space Invaders Test");
     window.setFramerateLimit(60);
+    
     sf::Font font;
     if(!font.openFromFile("C:/Windows/Fonts/arial.ttf"))
     {
@@ -42,18 +50,68 @@ sf::RectangleShape player({50.f,30.f});
     int lives=3;
 
     float enemyDirection=2.f;
+    std::string playerName="";
+    bool mainMenu=true;
+    bool enteringName=false;
+    bool showInstructions=false;
+    bool showLeaderboard=false;
+    bool playing=false;
     bool gameOver=false;
+    bool scoreSaved=false;
 
     sf::Clock playerShootClock;
     sf::Clock enemyShootClock;
 
-    sf::Text scoreText(font, "Score: 0", 24);
-    sf::Text livesText(font, "Lives: 3", 24);
-    sf::Text gameOverText(font,"Game Over - Press R to Resart",30);
+    sf::RectangleShape playButton({240.f,50.f});
+    sf::RectangleShape instructionButton({240.f,50.f});
+    sf::RectangleShape leaderboardButton({240.f,50.f});
+    sf::RectangleShape exitButton({240.f,50.f});
+    sf::RectangleShape backButton({180.f,45.f});
 
-    scoreText.setPosition({20.5,15.f});
+    playButton.setPosition({280.f,190.f});
+    instructionButton.setPosition({280.f,260.f});
+    leaderboardButton.setPosition({280.f,330.f});
+    exitButton.setPosition({280.f,400.f});
+    backButton.setPosition({310.f,510.f});
+
+    playButton.setFillColor(sf::Color(0,120,200));
+    instructionButton.setFillColor(sf::Color(0,120,200));
+    leaderboardButton.setFillColor(sf::Color(0,120,200));
+    exitButton.setFillColor(sf::Color(180,40,40));
+    backButton.setFillColor(sf::Color(0,120,200));
+
+    sf::Text titleText(font,"SPACE INVADERS",42);
+    sf::Text playText(font,"PLAY GAME",22);
+    sf::Text instructionMenuText(font,"INSTRUCTIONS",22);
+    sf::Text leaderboardMenuText(font,"LEADERBOARD",22);
+    sf::Text exitText(font,"EXIT",22);
+    sf::Text backText(font,"BACK",20);
+    sf::Text nameText(font,"Enter Your Name:",25);
+    sf::Text startText(font,"Press ENTER to Start",22);
+    sf::Text instructionsTitle(font,"HOW TO PLAY",32);
+
+    sf::Text instructionsText(font,"LEFT ARROW  - Move Left\n" "RIGHT ARROW - Move Right\n" "SPACE - Shoot\n" "Destroy enemies to earn 10 points\n""Avoid enemy bullets\n""Game ends when lives become zero\n""R - Restart after Game Over",20);
+    sf::Text menuleaderboardTitle(font,"TOP 5 LEADERBOARD",30);
+    sf::Text scoreText(font,"Score: 0",24);
+    sf::Text livesText(font,"Lives: 3",24);
+    sf::Text gameOverText(font,"GAME OVER",40);
+    sf::Text restartText(font,"R - Restart    M - Main Menu",22);
+
+    titleText.setPosition({205.f,65.f});
+    playText.setPosition({340.f,200.f});
+    instructionMenuText.setPosition({315.f,270.f});
+    leaderboardMenuText.setPosition({310.f,340.f});
+    exitText.setPosition({370.f,410.f});
+    backText.setPosition({370.f,518.f});
+    nameText.setPosition({230.f,240.f});
+    startText.setPosition({300.f,330.f});
+    instructionsTitle.setPosition({275.f,100.f});
+    instructionsText.setPosition({180.f,190.f});
+    menuleaderboardTitle.setPosition({250.f,100.f});
+    scoreText.setPosition({20.f,15.f});
     livesText.setPosition({680.f,15.f});
-    gameOverText.setPosition({150.f,270.f});
+    gameOverText.setPosition({300.f,100.f});
+    restartText.setPosition({260.f,530.f});
 
     while(window.isOpen())
     {
