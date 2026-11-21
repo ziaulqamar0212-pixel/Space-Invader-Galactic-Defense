@@ -2,6 +2,9 @@
 #include<iostream>
 #include<vector>
 #include<optional>
+#include<fstream>
+#include<string>
+#include<SFML/Audio.hpp>
 using namespace std;
 
 const int width=800;
@@ -16,6 +19,15 @@ struct Enemy
     sf::RectangleShape shape;
     bool alive;
 };
+sf::SoundBuffer shootBuffer;
+sf::SoundBuffer explosionBuffer;
+sf::SoundBuffer hitBuffer;
+sf::SoundBuffer gameoverBuffer;
+
+sf::Sound shootSound(shootBuffer);
+sf::Sound explosionSound(explosionBuffer);
+sf::Sound hitSound(hitBuffer);
+sf::Sound gameoverSound(gameoverBuffer);
 void createEnemies(vector<Enemy>& enemies)
 {
     enemies.clear();
@@ -119,6 +131,7 @@ void checkCollisions(vector<Bullet>& bullets, vector<Enemy>& enemies, sf::Rectan
                 {
                     enemies[j].alive = false;
                     score += 10;
+                    explosionSound.play();
                     bullets.erase(bullets.begin() + i);
                     bulletRemoved = true;
                     break;
@@ -127,11 +140,11 @@ void checkCollisions(vector<Bullet>& bullets, vector<Enemy>& enemies, sf::Rectan
         }
         if (!bulletRemoved && i < bullets.size())
         {
-            if (!bullets[i].fromplayer &&
-                bullets[i].shape.getGlobalBounds().findIntersection(
+            if (!bullets[i].fromplayer && bullets[i].shape.getGlobalBounds().findIntersection(
                     player.getGlobalBounds()))
             {
                 lives--;
+                hitSound.play();
                 bullets.erase(bullets.begin() + i);
             }
         }
@@ -146,4 +159,92 @@ int countEnemies(vector<Enemy>& enemies)
             count++;
     }
     return count;
+}
+struct scoreentry
+{
+    string name;
+    int score;
+};
+void loadSounds()
+{
+    shootBuffer.loadFromFile("sounds/shoot.wav");
+    explosionBuffer.loadFromFile("sounds/explosion.wav");
+    hitBuffer.loadFromFile("sounds/hit.wav");
+    gameoverBuffer.loadFromFile("sounds/gameover.wav");
+}
+void sortleaderboard(vector<scoreentry>& scores)
+{
+    for (int i = 0; i < (int)scores.size() - 1; i++)
+    {
+        for (int j = 0; j < (int)scores.size() - i - 1; j++)
+        {
+            if (scores[j].score < scores[j + 1].score)
+            {
+                scoreentry temp = scores[j];
+                scores[j] = scores[j + 1];
+                scores[j + 1] = temp;
+            }
+        }
+    }
+}
+void loadleaderboard(vector<scoreentry>& scores)
+{
+    scores.clear();
+    ifstream file("leaderboard.txt");
+    string line;
+    while(getline(file,line))
+    {
+        scoreentry entry;
+        entry.score=0;
+        entry.name="";
+        int i=0;
+        while(line[i]!=' ' && line[i]!='\0')
+        {
+            entry.score=entry.score*10+(line[i]-'0');
+            i++;
+        }
+        if(line[i]==' ')
+        {
+            i++;
+            entry.name="";
+            while(line[i]!='\0')
+            {
+                entry.name+=line[i];
+                i++;
+            }
+        }
+        if(entry.name!="")
+            scores.push_back(entry);
+    }
+    file.close();
+    sortleaderboard(scores);
+}
+void savecore(const string& name, int score)
+{
+    ofstream file("leaderboard.txt", ios::app);
+
+    if (file.is_open())
+    {
+        file << score << " " << name << endl;
+        file.close();
+    }
+    else
+    {
+        cout << "Could not save leaderboard file!" << endl;
+    }
+}
+bool enemyreachedplayer(vector<Enemy>& enemies, sf::RectangleShape& player)
+{
+    for(int i=0;i<enemies.size();i++)
+    {
+        if(enemies[i].alive)
+        {
+            if(enemies[i].shape.getGlobalBounds().findIntersection(
+                player.getGlobalBounds()))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
