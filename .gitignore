@@ -1,0 +1,4 @@
+*.exe
+*.dll
+leaderboard.txt
+output/
