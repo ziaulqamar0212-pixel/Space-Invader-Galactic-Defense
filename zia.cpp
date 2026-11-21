@@ -2,6 +2,7 @@
 #include<iostream>
 #include<vector>
 #include <string>
+using namespace std;
 const int WIDTH = 800;
 const int HEIGHT = 600;
 void drawPlayer(sf::RenderWindow& window,sf::RectangleShape&player)
@@ -90,7 +91,7 @@ sf::RectangleShape player({50.f,30.f});
     sf::Text startText(font,"Press ENTER to Start",22);
     sf::Text instructionsTitle(font,"HOW TO PLAY",32);
 
-    sf::Text instructionsText(font,"LEFT ARROW  - Move Left\n" "RIGHT ARROW - Move Right\n" "SPACE - Shoot\n" "Destroy enemies to earn 10 points\n""Avoid enemy bullets\n""Game ends when lives become zero\n""R - Restart after Game Over",20);
+    sf::Text instructionsText(font,"LEFT ARROW  - Move Left\n" "RIGHT ARROW - Move Right\n" "SPACE - Shoot\n" "Destroy enemies  to earn 10 points\n""Avoid enemy bullets\n""Game ends when lives become zero\n""R - Restart after Game Over",20);
     sf::Text menuleaderboardTitle(font,"TOP 5 LEADERBOARD",30);
     sf::Text scoreText(font,"Score: 0",24);
     sf::Text livesText(font,"Lives: 3",24);
@@ -113,101 +114,263 @@ sf::RectangleShape player({50.f,30.f});
     gameOverText.setPosition({300.f,100.f});
     restartText.setPosition({260.f,530.f});
 
-    while(window.isOpen())
+   while(window.isOpen())
+{
+    while(const optional event=window.pollEvent())
     {
-        while(const optional event =window.pollEvent())
+        if(event->is<sf::Event::Closed>())
         {
-            if(event->is<sf::Event::Closed>())
+            window.close();
+        }
+
+        if(const auto* mouseButton=event->getIf<sf::Event::MouseButtonPressed>())
+        {
+            if(mouseButton->button==sf::Mouse::Button::Left)
             {
-                window.close();
+                sf::Vector2f mousePosition(
+                    static_cast<float>(mouseButton->position.x),
+                    static_cast<float>(mouseButton->position.y)
+                );
+
+                if(mainMenu)
+                {
+                    if(playButton.getGlobalBounds().contains(mousePosition))
+                    {
+                        mainMenu=false;
+                        enteringName=true;
+                    }
+                    else if(instructionButton.getGlobalBounds().contains(mousePosition))
+                    {
+                        mainMenu=false;
+                        showInstructions=true;
+                    }
+                    else if(leaderboardButton.getGlobalBounds().contains(mousePosition))
+                    {
+                        mainMenu=false;
+                        showLeaderboard=true;
+                    }
+                    else if(exitButton.getGlobalBounds().contains(mousePosition))
+                    {
+                        window.close();
+                    }
+                }
+                else if(showInstructions || showLeaderboard)
+                {
+                    if(backButton.getGlobalBounds().contains(mousePosition))
+                    {
+                        showInstructions=false;
+                        showLeaderboard=false;
+                        mainMenu=true;
+                    }
+                }
             }
         }
-        if(!gameOver)
-        {
-            movePlayer(player);
 
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
+        if(enteringName)
+        {
+            if(const auto* key=event->getIf<sf::Event::KeyPressed>())
             {
-                if(playerShootClock.getElapsedTime().asSeconds()>0.35f)
+                if(key->code==sf::Keyboard::Key::Enter && playerName.length()>0)
                 {
-                    addPlayerBullet(bullets, player);
+                    enteringName=false;
+                    playing=true;
+                    score=0;
+                    lives=3;
+                    scoreSaved=false;
+                    bullets.clear();
+                    createEnemies(enemies);
+                    player.setPosition({375.f,540.f});
+                    enemyDirection=2.f;
                     playerShootClock.restart();
+                    enemyShootClock.restart();
                 }
-            }
-            if(enemyShootClock.getElapsedTime().asSeconds()>1.2f)
-            {
-                addEnemyBullet(bullets, enemies);
-                enemyShootClock.restart();
-            }
-        
 
-            moveEnemies(enemies, enemyDirection);
-            moveBullets(bullets);
-
-            checkCollisions(
-                bullets,
-                enemies,
-                player,
-                score,
-                lives
-            );
-
-            if (countEnemies(enemies) == 0)
-            {
-                createEnemies(enemies);
-            }
-
-            if (lives <= 0)
-            {
-                gameOver = true;
-            }
-
-            for (int i = (int)bullets.size() - 1; i >= 0; i--)
-            {
-                float y = bullets[i].shape.getPosition().y;
-
-                if (y < 0 || y > HEIGHT)
+                if(key->code==sf::Keyboard::Key::Backspace && playerName.length()>0)
                 {
-                    bullets.erase(bullets.begin() + i);
+                    playerName.pop_back();
+                }
+
+                if(key->code==sf::Keyboard::Key::Escape)
+                {
+                    enteringName=false;
+                    mainMenu=true;
+                }
+            }
+
+            if(const auto* text=event->getIf<sf::Event::TextEntered>())
+            {
+                if(text->unicode>=32 && text->unicode<=126 && playerName.length()<15)
+                {
+                    playerName+=static_cast<char>(text->unicode);
                 }
             }
         }
-        else
+        else if(gameOver)
         {
-            if (sf::Keyboard::isKeyPressed(
-                sf::Keyboard::Key::R))
+            if(const auto* key=event->getIf<sf::Event::KeyPressed>())
             {
-                score = 0;
-                lives = 3;
-                gameOver = false;
+                if(key->code==sf::Keyboard::Key::R)
+                {
+                    score=0;
+                    lives=3;
+                    gameOver=false;
+                    playing=true;
+                    scoreSaved=false;
+                    bullets.clear();
+                    createEnemies(enemies);
+                    player.setPosition({375.f,540.f});
+                    enemyDirection=2.f;
+                    playerShootClock.restart();
+                    enemyShootClock.restart();
+                }
 
-                bullets.clear();
-                createEnemies(enemies);
-
-                player.setPosition({375.f, 540.f});
-                enemyDirection = 2.f;
+                if(key->code==sf::Keyboard::Key::M)
+                {
+                    gameOver=false;
+                    mainMenu=true;
+                    playing=false;
+                    playerName="";
+                }
             }
         }
-
-        scoreText.setString("Score: " + to_string(score));
-        livesText.setString("Lives: " + to_string(lives));
-
-        window.clear(sf::Color::Black);
-
-        drawPlayer(window, player);
-        drawEnemies(window, enemies);
-        drawBullets(window, bullets);
-
-        window.draw(scoreText);
-        window.draw(livesText);
-
-        if (gameOver)
-        {
-            window.draw(gameOverText);
-        }
-
-        window.display();
     }
 
+    if(playing && !gameOver)
+    {
+        movePlayer(player);
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
+        {
+            if(playerShootClock.getElapsedTime().asSeconds()>0.35f)
+            {
+                addPlayerBullet(bullets,player);
+                playerShootClock.restart();
+            }
+        }
+
+        if(enemyShootClock.getElapsedTime().asSeconds()>1.2f)
+        {
+            addEnemyBullet(bullets,enemies);
+            enemyShootClock.restart();
+        }
+
+        moveEnemies(enemies,enemyDirection);
+
+        if(enemyReachedPlayer(enemies,player))
+        {
+            lives=0;
+        }
+
+        moveBullets(bullets);
+
+        checkCollisions(bullets,enemies,player,score,lives);
+
+        if(countEnemies(enemies)==0)
+        {
+            createEnemies(enemies);
+        }
+
+        if(lives<=0)
+        {
+            gameOver=true;
+            playing=false;
+
+            if(!scoreSaved)
+            {
+                savecore(playerName,score);
+                scoreSaved=true;
+            }
+        }
+
+        for(int i=(int)bullets.size()-1;i>=0;i--)
+        {
+            float y=bullets[i].shape.getPosition().y;
+
+            if(y<0 || y>HEIGHT)
+            {
+                bullets.erase(bullets.begin()+i);
+            }
+        }
+    }
+
+    scoreText.setString("Score: "+to_string(score));
+    livesText.setString("Lives: "+to_string(lives));
+    window.clear(sf::Color::Black);
+
+    if(mainMenu)
+    {
+        window.draw(titleText);
+        drawButton(window,playButton,playText);
+        drawButton(window,instructionButton,instructionMenuText);
+        drawButton(window,leaderboardButton,leaderboardMenuText);
+        drawButton(window,exitButton,exitText);
+    }
+    else if(enteringName)
+    {
+        nameText.setString("Enter Your Name: "+playerName);
+        window.draw(titleText);
+        window.draw(nameText);
+        window.draw(startText);
+    }
+    else if(showInstructions)
+    {
+        window.draw(instructionsTitle);
+        window.draw(instructionsText);
+        drawButton(window,backButton,backText);
+    }
+    else if(showLeaderboard)
+    {
+        window.draw(menuLeaderboardTitle);
+        vector<scoreentry> scores;
+        loadleaderboard(scores);
+
+        if(scores.size()==0)
+        {
+            sf::Text emptyText(font,"No Scores Yet!",22);
+            emptyText.setPosition({310.f,220.f});
+            window.draw(emptyText);
+        }
+
+        for(int i=0;i<scores.size() && i<5;i++)
+        {
+            sf::Text entryText(font,to_string(i+1)+". "+scores[i].name+" - "+to_string(scores[i].score),22);
+            entryText.setPosition({260.f,190.f+i*45.f});
+            window.draw(entryText);
+        }
+
+        drawButton(window,backButton,backText);
+    }
+    else if(gameOver)
+    {
+        window.draw(gameOverText);
+        window.draw(scoreText);
+
+        sf::Text leaderboardTitle(font,"TOP 5 LEADERBOARD",28);
+        leaderboardTitle.setPosition({250.f,170.f});
+        window.draw(leaderboardTitle);
+
+        vector<scoreentry> scores;
+        loadleaderboard(scores);
+
+        for(int i=0;i<scores.size() && i<5;i++)
+        {
+            sf::Text entryText(font, to_string(i+1)+". "+scores[i].name+" - "+to_string(scores[i].score),22);
+            entryText.setPosition({260.f,230.f+i*40.f});
+            window.draw(entryText);
+        }
+
+        window.draw(restartText);
+    }
+    else if(playing)
+    {
+        drawPlayer(window,player);
+        drawEnemies(window,enemies);
+        drawBullets(window,bullets);
+        window.draw(scoreText);
+        window.draw(livesText);
+    }
+
+    window.display();
+}
     return 0;
 }
