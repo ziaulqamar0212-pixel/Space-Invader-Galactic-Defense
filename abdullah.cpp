@@ -3,6 +3,8 @@
 #include<vector>
 #include<optional>
 #include<fstream>
+#include<string>
+#include<SFML/Audio.hpp>
 using namespace std;
 
 const int width=800;
@@ -17,6 +19,15 @@ struct Enemy
     sf::RectangleShape shape;
     bool alive;
 };
+sf::SoundBuffer shootBuffer;
+sf::SoundBuffer explosionBuffer;
+sf::SoundBuffer hitBuffer;
+sf::SoundBuffer gameoverBuffer;
+
+sf::Sound shootSound(shootBuffer);
+sf::Sound explosionSound(explosionBuffer);
+sf::Sound hitSound(hitBuffer);
+sf::Sound gameoverSound(gameoverBuffer);
 void createEnemies(vector<Enemy>& enemies)
 {
     enemies.clear();
@@ -120,6 +131,7 @@ void checkCollisions(vector<Bullet>& bullets, vector<Enemy>& enemies, sf::Rectan
                 {
                     enemies[j].alive = false;
                     score += 10;
+                    explosionSound.play();
                     bullets.erase(bullets.begin() + i);
                     bulletRemoved = true;
                     break;
@@ -128,11 +140,11 @@ void checkCollisions(vector<Bullet>& bullets, vector<Enemy>& enemies, sf::Rectan
         }
         if (!bulletRemoved && i < bullets.size())
         {
-            if (!bullets[i].fromplayer &&
-                bullets[i].shape.getGlobalBounds().findIntersection(
+            if (!bullets[i].fromplayer && bullets[i].shape.getGlobalBounds().findIntersection(
                     player.getGlobalBounds()))
             {
                 lives--;
+                hitSound.play();
                 bullets.erase(bullets.begin() + i);
             }
         }
@@ -148,16 +160,18 @@ int countEnemies(vector<Enemy>& enemies)
     }
     return count;
 }
-struct Enemy
-{
-    sf::RectangleShape shape;
-    bool alive;
-};
 struct scoreentry
 {
     string name;
     int score;
 };
+void loadSounds()
+{
+    shootBuffer.loadFromFile("sounds/shoot.wav");
+    explosionBuffer.loadFromFile("sounds/explosion.wav");
+    hitBuffer.loadFromFile("sounds/hit.wav");
+    gameoverBuffer.loadFromFile("sounds/gameover.wav");
+}
 void sortleaderboard(vector<scoreentry>& scores)
 {
     for (int i = 0; i < (int)scores.size() - 1; i++)
@@ -178,21 +192,29 @@ void loadleaderboard(vector<scoreentry>& scores)
     scores.clear();
     ifstream file("leaderboard.txt");
     string line;
-    while (getline(file, line))
+    while(getline(file,line))
     {
-        stringstream row(line);
         scoreentry entry;
-
-        if (row >> entry.score)
+        entry.score=0;
+        entry.name="";
+        int i=0;
+        while(line[i]!=' ' && line[i]!='\0')
         {
-            getline(row, entry.name);
-
-            if (!entry.name.empty() && entry.name[0] == ' ')
-                entry.name.erase(0, 1);
-
-            if (!entry.name.empty())
-                scores.push_back(entry);
+            entry.score=entry.score*10+(line[i]-'0');
+            i++;
         }
+        if(line[i]==' ')
+        {
+            i++;
+            entry.name="";
+            while(line[i]!='\0')
+            {
+                entry.name+=line[i];
+                i++;
+            }
+        }
+        if(entry.name!="")
+            scores.push_back(entry);
     }
     file.close();
     sortleaderboard(scores);
@@ -208,10 +230,10 @@ void savecore(const string& name, int score)
     }
     else
     {
-        cout << "Could not savegit restore --staged .gitignore Space-Invader-Galactic-Defense leaderboard file!" << endl;
+        cout << "Could not save leaderboard file!" << endl;
     }
 }
-bool enemyReachedPlayer(vector<Enemy>& enemies, sf::RectangleShape& player)
+bool enemyreachedplayer(vector<Enemy>& enemies, sf::RectangleShape& player)
 {
     for(int i=0;i<enemies.size();i++)
     {
