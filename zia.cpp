@@ -2,6 +2,7 @@
 #include<iostream>
 #include<vector>
 #include <string>
+#include <SFML/Audio.hpp>
 using namespace std;
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -244,6 +245,7 @@ sf::RectangleShape player({50.f,30.f});
             if(playerShootClock.getElapsedTime().asSeconds()>0.35f)
             {
                 addPlayerBullet(bullets,player);
+                shootSound.play();
                 playerShootClock.restart();
             }
         }
@@ -272,6 +274,7 @@ sf::RectangleShape player({50.f,30.f});
 
         if(lives<=0)
         {
+            gameoverSound.play();
             gameOver=true;
             playing=false;
 
