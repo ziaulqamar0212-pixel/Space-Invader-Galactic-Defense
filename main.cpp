@@ -505,7 +505,7 @@ sf::RectangleShape player({50.f,30.f});
 
         moveEnemies(enemies,enemyDirection);
 
-        if(enemyReachedPlayer(enemies,player))
+        if(enemyreachedplayer(enemies,player))
         {
             lives=0;
         }
@@ -570,7 +570,7 @@ sf::RectangleShape player({50.f,30.f});
     }
     else if(showLeaderboard)
     {
-        window.draw(menuLeaderboardTitle);
+        window.draw(menuleaderboardTitle);
         vector<scoreentry> scores;
         loadleaderboard(scores);
 
