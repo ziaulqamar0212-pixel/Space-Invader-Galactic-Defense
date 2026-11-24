@@ -60,3 +60,26 @@ How to Play
 4. Move your spaceship and shoot the enemies.
 5. Avoid enemy bullets and try to achieve the highest score.
 6. After Game Over, press R to play again or M to return to the main menu.
+
+Building and Running the Project
+
+Requirements:
+
+- C++ compiler
+- SFML graphics library
+- Visual Studio or VS Code
+
+Compiling the Game:
+
+- Make sure SFML is installed and properly configured.
+- Open the project in your IDE.
+- Compile the main.cpp file with the required SFML libraries.
+- Make sure the sounds folder and leaderboard.txt file are in the correct project directory.
+
+Running the Game:
+
+- Run the compiled game file.
+- The main menu will appear on the screen.
+- Select Play Game to start playing.
+
+Note: Only main.cpp should be compiled as the main game file. The zia.cpp and abdullah.cpp files contain separate team contributions and are already included in main.cpp.
